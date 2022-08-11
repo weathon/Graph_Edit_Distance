@@ -210,7 +210,7 @@ void clean_up()
 	}
 }
 
-int main()
+int _main()
 {
 	init();
 	cout<<query(0, 1)<<endl;
