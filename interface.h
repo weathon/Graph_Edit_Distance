@@ -139,6 +139,35 @@ bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
 	return false;
 }
 
+bool verLessOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
+{
+	verify_upper_bound = vub;
+	ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+	if (lb > verify_upper_bound)
+		return false;
+	Application *app = new Application(verify_upper_bound, "BMao");
+	app->init(db[id1], db[id2]);
+	int res = INF;
+	res = app->AStar();
+	if (res <= verify_upper_bound)
+		return true;
+	return false;
+}
+
+bool verMoreOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
+{
+	verify_upper_bound = vub;
+	ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+	if (lb > verify_upper_bound)
+		return false;
+	Application *app = new Application(verify_upper_bound, "BMao");
+	app->init(db[id1], db[id2]);
+	int res = INF;
+	res = app->AStar();
+	if (res <= verify_upper_bound)
+		return true;
+	return false;
+}
 int query(int id1, int id2)
 {
 
