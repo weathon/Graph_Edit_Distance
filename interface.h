@@ -164,7 +164,7 @@ bool verMoreOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
 	app->init(db[id1], db[id2]);
 	int res = INF;
 	res = app->AStar();
-	if (res <= verify_upper_bound)
+	if (res >= verify_upper_bound)
 		return true;
 	return false;
 }
