@@ -140,12 +140,18 @@ bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
 }
 //cxyueduzhelidaimazhsodaolkunxiswuwufajlxlaiyuedukkzjzangkkzachidxzlilbdeyucecuileaaaakunkkkkun
 ///ublb could be reuse witjin calls and begin and stack kunkoukekunkouxhaojiganyachi
-bool verLessOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
+bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) //If the real dis is lower than vub
 {
+	if(cache!=-1) return cache;
+	cache = -1;
 	if(vub<0)
 		return false;
 	verify_upper_bound = vub;
-	ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+	if(lb == -1)
+	{
+		lb = db[id1]->ged_lower_bound_filter(db[id2], INF, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+		lbreturn = lb;
+	}
 	if (lb > verify_upper_bound)
 		return false;
 	Application *app = new Application(verify_upper_bound, "BMao");
@@ -154,6 +160,7 @@ bool verLessOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
 	res = app->AStar();
 	if (res <= verify_upper_bound)
 	{
+		cache = res;
 		delete app;
 		return true;
 	}
