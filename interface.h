@@ -143,26 +143,42 @@ bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
 bool verLessOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
 {
 	if(vub<0)
-return false;
-	cout<<vub<<endl;
+		return false;
 	verify_upper_bound = vub;
 	ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
-	cout<<"lb:"<<lb<<endl;
 	if (lb > verify_upper_bound)
-	{cout<<"false"<<endl;	return false;} //lb=7, vub is an negative number, then why it did not enter here??????? kunyunienskun nasnhoujiusuanmeiyou 
+		return false;
 	Application *app = new Application(verify_upper_bound, "BMao");
 	app->init(db[id1], db[id2]);
 	int res = INF;
 	res = app->AStar();
-	cout<<"res:"<<res<<endl;
 	if (res <= verify_upper_bound)
+	{
 		delete app;
 		return true;
+	}
 	delete app;
 	return false;
+	// cout<<"tmp:+++++++++++++++++++++++++++++"<<*tmp;
+	// cout<<vub<<endl;
+	// verify_upper_bound = vub;
+	// ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+	// cout<<"lb:"<<lb<<endl;
+	// if (lb > verify_upper_bound)
+	// {cout<<"false"<<endl;	return false;} //lb=7, vub is an negative number, then why it did not enter here??????? kunyunienskun nasnhoujiusuanmeiyou 
+	// Application *app = new Application(verify_upper_bound, "BMao");
+	// app->init(db[id1], db[id2]);
+	// int res = INF;
+	// res = app->AStar();
+	// cout<<"res:"<<res<<endl;
+	// if (res <= verify_upper_bound)
+	// 	delete app;
+	// 	return true;
+	// delete app;
+	// return false;
 }
 
-bool verMoreOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
+/*bool verMoreOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
 {
 	if(vub<0)
 		return true;
@@ -179,7 +195,7 @@ bool verMoreOrEqu(int id1, int id2, int vub) //If the real dis is lower than vub
 		return true;
 	delete app;
 	return false;
-}
+}*/
 int query(int id1, int id2)
 {
 
