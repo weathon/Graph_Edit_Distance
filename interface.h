@@ -246,8 +246,9 @@ int query(int id1, int id2)
 	return res;
 }
 
-void init(string path)
+void init()
 {
+	string path = "../dataForReal/29/graphs.txt"
 	int threshold = -1;
 	bool print_ged = false;
 
@@ -305,7 +306,7 @@ void clean_up()
 
 int _main()
 {
-	init("../dataForReal/graphs.txt");
+	init();
 	cout<<query(0, 1)<<endl;
 	cout<<query(0, 3)<<endl;
 	cout<<query(0, 5)<<endl;
