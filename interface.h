@@ -142,7 +142,12 @@ bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
 ///ublb could be reuse witjin calls and begin and stack kunkoukekunkouxhaojiganyachi
 bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) //If the real dis is lower than vub
 {
-	if(cache!=-1) return cache;
+	// if(cache != -1) return cache; //jiaosuankunchaojihoajisoaunkunyunkunyunsuannashouyachi kundebuxingwhyhhgehuiyouernyo wotamadezaixiangshetaikunle kunchoajiyuntt
+	// if(cache != -1)
+	// {
+	// 	cout<<"cache:"<<cache<<endl;
+	// 	return (cache<=verify_upper_bound);
+	// }
 	cache = -1;
 	if(vub<0)
 		return false;
@@ -158,13 +163,18 @@ bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) 
 	app->init(db[id1], db[id2]);
 	int res = INF;
 	res = app->AStar();
-	if (res <= verify_upper_bound)
+	if(res<vub)
 	{
 		cache = res;
-		delete app;
-		return true;
 	}
 	delete app;
+
+	if (res <= verify_upper_bound)
+	{
+		cout<<"res,vub="<<res<<" "<<verify_upper_bound<<endl;
+		return true;
+	}
+	cache = -1;
 	return false;
 	// cout<<"tmp:+++++++++++++++++++++++++++++"<<*tmp;
 	// cout<<vub<<endl;
