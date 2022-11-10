@@ -21,7 +21,7 @@ ui label2int(const char *str, map<string, ui> &M)
 	return M[string(str)];
 }
 
-ui load_db(const char *file_name, vector<Graph *> &graphs, map<string, ui> &vM, map<string, ui> &eM, int N=-1)
+ui load_db(const char *file_name, vector<Graph *> &graphs, map<string, ui> &vM, map<string, ui> &eM, int N = -1)
 {
 	FILE *fin = Utility::open_file(file_name, "r");
 
@@ -123,13 +123,15 @@ int *degree_g;
 int *tmp;
 string mode, paradigm, lower_bound;
 
-
-bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
+bool verification(int id1, int id2, int vub, bool checkLB=true) // If the real dis is lower than vub
 {
 	verify_upper_bound = vub;
-	ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
-	if (lb > verify_upper_bound)
-		return false;
+	if (checkLB)
+	{
+		ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
+		if (lb > verify_upper_bound)
+			return false;
+	}
 	Application *app = new Application(verify_upper_bound, "BMao");
 	app->init(db[id1], db[id2]);
 	int res = INF;
@@ -138,10 +140,11 @@ bool verification(int id1, int id2, int vub) //If the real dis is lower than vub
 		return true;
 	return false;
 }
-//cxyueduzhelidaimazhsodaolkunxiswuwufajlxlaiyuedukkzjzangkkzachidxzlilbdeyucecuileaaaakunkkkkun
-///ublb could be reuse witjin calls and begin and stack kunkoukekunkouxhaojiganyachi
-bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) //If the real dis is lower than vub
+// cxyueduzhelidaimazhsodaolkunxiswuwufajlxlaiyuedukkzjzangkkzachidxzlilbdeyucecuileaaaakunkkkkun
+/// ublb could be reuse witjin calls and begin and stack kunkoukekunkouxhaojiganyachi
+bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) // If the real dis is lower than vub
 {
+
 	// if(cache != -1) return cache; //jiaosuankunchaojihoajisoaunkunyunkunyunsuannashouyachi kundebuxingwhyhhgehuiyouernyo wotamadezaixiangshetaikunle kunchoajiyuntt
 	// if(cache != -1)
 	// {
@@ -149,13 +152,18 @@ bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) 
 	// 	return (cache<=verify_upper_bound);
 	// }
 	cache = -1;
-	if(vub<0)
+	if (vub < 0)
 		return false;
 	verify_upper_bound = vub;
-	if(lb == -1)
+	if (lb == -1)
 	{
 		lb = db[id1]->ged_lower_bound_filter(db[id2], INF, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
 		lbreturn = lb;
+	}
+	// cout<<vub<<endl;// zhiqianmeiyou print vubgaiucolekoukehsouzhiyemeizaireturnzhiqian
+	if(vub<0)
+	{
+		cout<<"🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"<<endl;
 	}
 	if (lb > verify_upper_bound)
 		return false;
@@ -163,15 +171,12 @@ bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) 
 	app->init(db[id1], db[id2]);
 	int res = INF;
 	res = app->AStar();
-	if(res<vub)
-	{
-		cache = res;
-	}
+
 	delete app;
 
-	if (res <= verify_upper_bound)
+	cout << "res,vub=" << res << " " << verify_upper_bound << endl;
+	if (res <= vub)
 	{
-		cout<<"res,vub="<<res<<" "<<verify_upper_bound<<endl;
 		return true;
 	}
 	cache = -1;
@@ -182,7 +187,7 @@ bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) 
 	// ui lb = db[id1]->ged_lower_bound_filter(db[id2], vub, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
 	// cout<<"lb:"<<lb<<endl;
 	// if (lb > verify_upper_bound)
-	// {cout<<"false"<<endl;	return false;} //lb=7, vub is an negative number, then why it did not enter here??????? kunyunienskun nasnhoujiusuanmeiyou 
+	// {cout<<"false"<<endl;	return false;} //lb=7, vub is an negative number, then why it did not enter here??????? kunyunienskun nasnhoujiusuanmeiyou
 	// Application *app = new Application(verify_upper_bound, "BMao");
 	// app->init(db[id1], db[id2]);
 	// int res = INF;
@@ -220,8 +225,8 @@ int query(int id1, int id2)
 	// cout<<"lb = "<<lb<<endl;
 	// if (lb > verify_upper_bound)
 	// 	return -1;
-	//need the vub not the lb!!!!!!!! The result before is not useable! chaojikun hcaojikun yunnashoueixn quanbuhconglai 
-	//WHY!!?!?!?jiaotong 
+	// need the vub not the lb!!!!!!!! The result before is not useable! chaojikun hcaojikun yunnashoueixn quanbuhconglai
+	// WHY!!?!?!?jiaotong
 
 	// ++candidates_cnt;
 	Timer t1;
@@ -248,7 +253,7 @@ int query(int id1, int id2)
 
 void init()
 {
-	string path = "../dataForReal/29/graphs.txt"
+	string path = "../dataForReal/29/graphs.txt";
 	int threshold = -1;
 	bool print_ged = false;
 
@@ -307,9 +312,9 @@ void clean_up()
 int _main()
 {
 	init();
-	cout<<query(0, 1)<<endl;
-	cout<<query(0, 3)<<endl;
-	cout<<query(0, 5)<<endl;
+	cout << query(0, 1) << endl;
+	cout << query(0, 3) << endl;
+	cout << query(0, 5) << endl;
 	clean_up();
 	return 0;
 }
