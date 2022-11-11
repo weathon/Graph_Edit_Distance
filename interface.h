@@ -174,7 +174,7 @@ bool verLessOrEqu(int id1, int id2, int vub, int lb, int &lbreturn, int &cache) 
 
 	delete app;
 
-	cout << "res,vub=" << res << " " << verify_upper_bound << endl;
+	// cout << "res,vub=" << res << " " << verify_upper_bound << endl;
 	if (res <= vub)
 	{
 		return true;
