@@ -214,6 +214,6 @@ int main()
 {
 	init();
 	for(int i=0;i<=3000;i++)
-	cout<<query(0, i)<<endl;
+	query(3500, i);
 	return 0;
 }
