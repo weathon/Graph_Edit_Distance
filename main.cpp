@@ -235,7 +235,7 @@ void clean_up()
 int main()
 {
 	init();
-	ui v[]={5, 8, 10};
+	ui v[]={5, 10, 26};
 	// cout<<verify(0, 1, v)<<endl; //1
 	// cout<<verify(0, 3, v)<<endl; //4 now it says 6
 	// cout<<verify(0, 5, v)<<endl; //6
@@ -246,14 +246,18 @@ int main()
 	// cout<<verify(0, 11, v)<<endl; 
 	// cout<<verify(0, 12, v)<<endl; 
 	// clean_up();
-	cout<<verify(0, 1, v)<<endl; //1
-	cout<<verify(0, 3, v)<<endl; //4
-	cout<<verify(0, 5, v)<<endl; //6
-	cout<<verify(0, 7, v)<<endl;  //6
-	cout<<verify(0, 51, v)<<endl; //11
-	cout<<verify(0, 50, v)<<endl;  //9
-	cout<<verify(0, 18, v)<<endl;  //8
-	cout<<verify(0, 14, v)<<endl;  //6
-	cout<<verify(0, 10, v)<<endl;  //6
+	// cout<<verify(0, 1, v)<<endl; //1
+	// cout<<verify(0, 3, v)<<endl; //4
+	// cout<<verify(0, 5, v)<<endl; //6
+	// cout<<verify(0, 7, v)<<endl;  //6
+	// cout<<verify(0, 51, v)<<endl; //11
+	// cout<<verify(0, 50, v)<<endl;  //9
+	// cout<<verify(0, 18, v)<<endl;  //8
+	// cout<<verify(0, 14, v)<<endl;  //6
+	// cout<<verify(0, 10, v)<<endl;  //6
+	for(int i=0;i<=3000;i++)
+	{
+		cout<<verify(0, i, v)<<endl;  //6
+	}
 	return 0;
 }
