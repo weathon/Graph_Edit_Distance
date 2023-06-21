@@ -113,7 +113,7 @@ void write_queries(const char *file_name, const vector<Graph *> &db, const vecto
 }
 
 vector<Graph *> db;
-ui verify_upper_bound;
+
 int *vlabel_cnt;
 int *elabel_cnt;
 
@@ -122,13 +122,28 @@ int *degree_g;
 int *tmp;
 string mode, paradigm, lower_bound;
 
-int query(int id1, int id2)
+struct trio{
+	int a,b,c;
+};
+
+std::ostream& operator<<(std::ostream& os, const trio& obj) {
+	// by chatgpt
+    os << obj.a<< " "<<obj.b<<" "<<obj.c;
+    return os;
+}
+
+trio verify(int id1, int id2, ui verify_upper_bounds[3]) //return 1 if >= 
 {
+	ui verify_upper_bound = 0; //why i set it as -1
+	for(int i=0; i<=3; i++)
+	{
+		verify_upper_bound = max(verify_upper_bound, verify_upper_bounds[i]);
+	}
 
 	ui lb = db[id1]->ged_lower_bound_filter(db[id2], verify_upper_bound, vlabel_cnt, elabel_cnt, degree_q, degree_g, tmp);
 
 	if (lb > verify_upper_bound)
-		return -1;
+		return trio{1, 1, 1};
 	// this is not nessnery for ours because everything we have is already lower or equal to the lower bound
 	// ++candidates_cnt;
 	Timer t1;
@@ -150,23 +165,27 @@ int query(int id1, int id2)
 	// printf("%d", res);
 
 	delete app;
-	return res;
+	trio ret = trio{0,0,0};//forget about this
+	// cout<<res<<endl;
+	if(res>=verify_upper_bounds[0])
+		ret.a = 1;
+	if(res>=verify_upper_bounds[1])
+		ret.b = 1;
+	if(res>=verify_upper_bounds[2])
+		ret.c = 1;
+	return ret;
 }
 
 void init()
 {
-	int threshold = -1;
 	bool print_ged = false;
 
-	string database = "../dataForReal/graphs.txt";
+	string database = "./datasets/AIDS.txt";
+	// string database = "../dataForReal/graphs.txt";
 
 	map<string, ui> vM, eM;
 	ui max_db_n = load_db(database.c_str(), db, vM, eM);
-	// printf("%ld\n", db.size());
-	if (threshold < 0)
-		verify_upper_bound = INF;
-	else
-		verify_upper_bound = (ui)threshold;
+
 
 	long long search_space = 0;
 	long long results_cnt = 0, candidates_cnt = 0;
@@ -213,9 +232,10 @@ void clean_up()
 int main()
 {
 	init();
-	cout<<query(0, 1)<<endl;
-	cout<<query(0, 3)<<endl;
-	cout<<query(0, 5)<<endl;
+	ui v[]={0, 2, 5};
+	cout<<verify(0, 1, v)<<endl; //1
+	cout<<verify(0, 3, v)<<endl; //4 now it says 6
+	cout<<verify(0, 5, v)<<endl; //6
 	// clean_up();
 	return 0;
 }
