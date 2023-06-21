@@ -158,7 +158,7 @@ void init()
 	int threshold = -1;
 	bool print_ged = false;
 
-	string database = "../dataForReal/graphs.txt";
+	string database = "./datasets/AIDS.txt";
 
 	map<string, ui> vM, eM;
 	ui max_db_n = load_db(database.c_str(), db, vM, eM);
