@@ -1,0 +1,91 @@
+ui Application::DFS(State *node) 
+{
+	if(MO == NULL) compute_mapping_order();
+
+	ui start_level = 0;
+	if(node != NULL) start_level = node->level;
+	State **stack = NULL;
+	if(search_n > start_level) stack = new State*[search_n - start_level];
+
+	ui start = 0;
+	if(node != NULL) {
+		start = 1;
+		stack[0] = node;
+	}
+	State *tt = NULL;
+	if(search_n > start_level + start) tt = new State[search_n-start_level-start];
+	for(ui i = start;i < search_n - start_level;i ++) {
+		stack[i] = &tt[i-start];
+#ifdef _EXPAND_ALL_
+		stack[i]->siblings = NULL;
+		if(g_n > i + start_level + 1) stack[i]->siblings = new ushort[(g_n - i - start_level - 1)*2];
+#endif
+	}
+
+#ifndef _EXPAND_ALL_
+	if(visited_siblings == NULL) {
+		visited_siblings = new ushort[q_n*g_n];
+		visited_siblings_n = new ushort[q_n];
+	}
+#endif
+
+	if(node == NULL) generate_best_extension(NULL, stack[0]);
+
+	State full;
+
+#ifndef NDEBUG
+	ui *cnt = new ui[q_n+g_n+q_starts[q_n]+g_starts[g_n]];
+	memset(cnt, 0, sizeof(ui)*(q_n+g_n+q_starts[q_n]+g_starts[g_n]));
+	ui total = 0;
+#endif
+
+	int idx = 0;
+	while(idx >= 0&&(verify_upper_bound == INF||upper_bound > verify_upper_bound)) {
+		if(stack[idx]->image == g_n||stack[idx]->lower_bound >= upper_bound) {
+			-- idx;
+			if(idx >= 0&&stack[idx]->lower_bound < upper_bound) {
+#ifndef NDEBUG
+				++ cnt[stack[idx]->lower_bound];
+				++ total;
+#endif
+				construct_sibling(NULL, stack[idx]);
+			}
+			continue;
+		}
+
+		if(stack[idx]->level+1 == search_n) {
+#ifndef NDEBUG
+			++ cnt[stack[idx]->lower_bound];
+			++ total;
+#endif
+			extend_to_full_mapping(stack[idx], &full);
+			construct_sibling(NULL, stack[idx]);
+		}
+		else {
+			generate_best_extension(stack[idx], stack[idx+1]);
+			++ idx;
+		}
+	}
+
+#ifndef NDEBUG
+	ui smaller = 0, exact = cnt[upper_bound];
+	for(ui i = 0;i < upper_bound;i ++) smaller += cnt[i];
+	delete[] cnt; cnt = NULL;
+	printf("Extended #states smaller: %d, equal: %d, larger: %d\n", smaller, exact, total-smaller-exact);
+#endif
+
+#ifdef _EXPAND_ALL_
+	for(ui i = 0;i < search_n - start_level - start;i ++) if(tt[i].siblings != NULL) {
+		if(tt[i].siblings != NULL) delete[] tt[i].siblings;
+		tt[i].siblings = NULL;
+	}
+#endif
+	if(tt != NULL) delete[] tt;
+	tt = NULL;
+
+	for(ui i = 0;i < search_n - start_level;i ++) stack[i] = NULL;
+	if(stack != NULL) delete[] stack;
+	stack = NULL;
+
+	return upper_bound;
+}

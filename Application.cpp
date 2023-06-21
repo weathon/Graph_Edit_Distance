@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Application::Application(ui _verify_upper_bound, const char *lower_bound) {
+Application::Application(ui _min_verify_upper_bound, ui _max_verify_upper_bound, const char *lower_bound) {
 	q_n = g_n = 0;
 
 	q_starts = q_edges = q_vlabels = q_elabels = NULL;
@@ -11,8 +11,10 @@ Application::Application(ui _verify_upper_bound, const char *lower_bound) {
 
 	vlabels_n = elabels_n = 0;
 
-	verify_upper_bound = _verify_upper_bound;
-	upper_bound = verify_upper_bound+1;
+	// verify_upper_bound = _verify_upper_bound;
+	min_verify_upper_bound = _min_verify_upper_bound;
+	max_verify_upper_bound = _max_verify_upper_bound;
+	upper_bound = max_verify_upper_bound+1;
 
 	MO = NULL;
 	search_n_for_IS = search_n = 0;
@@ -325,96 +327,6 @@ ui Application::search_index(ui val, std::vector<ui> &array, ui array_len) {
 	return 0;
 }
 
-ui Application::DFS(State *node) {
-	if(MO == NULL) compute_mapping_order();
-
-	ui start_level = 0;
-	if(node != NULL) start_level = node->level;
-	State **stack = NULL;
-	if(search_n > start_level) stack = new State*[search_n - start_level];
-
-	ui start = 0;
-	if(node != NULL) {
-		start = 1;
-		stack[0] = node;
-	}
-	State *tt = NULL;
-	if(search_n > start_level + start) tt = new State[search_n-start_level-start];
-	for(ui i = start;i < search_n - start_level;i ++) {
-		stack[i] = &tt[i-start];
-#ifdef _EXPAND_ALL_
-		stack[i]->siblings = NULL;
-		if(g_n > i + start_level + 1) stack[i]->siblings = new ushort[(g_n - i - start_level - 1)*2];
-#endif
-	}
-
-#ifndef _EXPAND_ALL_
-	if(visited_siblings == NULL) {
-		visited_siblings = new ushort[q_n*g_n];
-		visited_siblings_n = new ushort[q_n];
-	}
-#endif
-
-	if(node == NULL) generate_best_extension(NULL, stack[0]);
-
-	State full;
-
-#ifndef NDEBUG
-	ui *cnt = new ui[q_n+g_n+q_starts[q_n]+g_starts[g_n]];
-	memset(cnt, 0, sizeof(ui)*(q_n+g_n+q_starts[q_n]+g_starts[g_n]));
-	ui total = 0;
-#endif
-
-	int idx = 0;
-	while(idx >= 0&&(verify_upper_bound == INF||upper_bound > verify_upper_bound)) {
-		if(stack[idx]->image == g_n||stack[idx]->lower_bound >= upper_bound) {
-			-- idx;
-			if(idx >= 0&&stack[idx]->lower_bound < upper_bound) {
-#ifndef NDEBUG
-				++ cnt[stack[idx]->lower_bound];
-				++ total;
-#endif
-				construct_sibling(NULL, stack[idx]);
-			}
-			continue;
-		}
-
-		if(stack[idx]->level+1 == search_n) {
-#ifndef NDEBUG
-			++ cnt[stack[idx]->lower_bound];
-			++ total;
-#endif
-			extend_to_full_mapping(stack[idx], &full);
-			construct_sibling(NULL, stack[idx]);
-		}
-		else {
-			generate_best_extension(stack[idx], stack[idx+1]);
-			++ idx;
-		}
-	}
-
-#ifndef NDEBUG
-	ui smaller = 0, exact = cnt[upper_bound];
-	for(ui i = 0;i < upper_bound;i ++) smaller += cnt[i];
-	delete[] cnt; cnt = NULL;
-	printf("Extended #states smaller: %d, equal: %d, larger: %d\n", smaller, exact, total-smaller-exact);
-#endif
-
-#ifdef _EXPAND_ALL_
-	for(ui i = 0;i < search_n - start_level - start;i ++) if(tt[i].siblings != NULL) {
-		if(tt[i].siblings != NULL) delete[] tt[i].siblings;
-		tt[i].siblings = NULL;
-	}
-#endif
-	if(tt != NULL) delete[] tt;
-	tt = NULL;
-
-	for(ui i = 0;i < search_n - start_level;i ++) stack[i] = NULL;
-	if(stack != NULL) delete[] stack;
-	stack = NULL;
-
-	return upper_bound;
-}
 
 ui Application::AStar(vector<pair<ui,ui> > *mapping_ptr, int *lb_ptr) {
 	if(MO == NULL) compute_mapping_order();
@@ -436,7 +348,7 @@ ui Application::AStar(vector<pair<ui,ui> > *mapping_ptr, int *lb_ptr) {
 	memset(cnt, 0, sizeof(ui)*(q_n+g_n+q_starts[q_n]+g_starts[g_n]));
 	ui total = 0;
 #endif
-	while(heap_n > 0&&heap[0]->lower_bound < upper_bound&&(verify_upper_bound == INF||upper_bound > verify_upper_bound)) {
+	while(heap_n > 0&&heap[0]->lower_bound < upper_bound&&(min_verify_upper_bound == INF||upper_bound > min_verify_upper_bound)) {
 		State *now = heap[0];
 		heap[0] = heap[-- heap_n];
 		heap_top_down(0, heap_n, heap);
@@ -972,7 +884,7 @@ void Application::compute_best_extension_LSa(State *now, ui n, ui *candidates, u
 
 	++ search_space;
 
-	if(now->lower_bound >= upper_bound||now->lower_bound > verify_upper_bound) {
+	if(now->lower_bound >= upper_bound||now->lower_bound > max_verify_upper_bound) {
 		now->image = g_n;
 		return ;
 	}
@@ -1071,7 +983,7 @@ void Application::compute_best_extension_BM(char anchor_aware, State *now, ui n,
 #endif
 
 	now->lower_bound = now->mapped_cost + (Hungarian(1, n, cost)+1)/2;
-	if(now->lower_bound >= upper_bound||now->lower_bound > verify_upper_bound) {
+	if(now->lower_bound >= upper_bound||now->lower_bound > max_verify_upper_bound) {
 		now->image = g_n;
 		return ;
 	}
@@ -1110,7 +1022,7 @@ void Application::compute_best_extension_BM(char anchor_aware, State *now, ui n,
 		cost[mx[0]] = INF; my[mx[0]] = -1; mx[0] = -1;
 		ui lb = p_mapping_cost + (Hungarian(0, n, cost)+1)/2;
 #ifdef _EARLY_STOP_
-		if(lb >= upper_bound||lb > verify_upper_bound) break;
+		if(lb >= upper_bound||lb > max_verify_upper_bound) break;
 #endif
 
 		t_array[now->siblings_n++] = candidates[mx[0]];
@@ -1154,7 +1066,7 @@ void Application::compute_best_extension_BMa(char anchor_aware, State *now, ui n
 	now->lower_bound = -children[n-pre_siblings-1].first;
 	compute_mapped_cost(now);
 
-	if(now->lower_bound >= upper_bound||now->lower_bound > verify_upper_bound) {
+	if(now->lower_bound >= upper_bound||now->lower_bound > max_verify_upper_bound) {
 		now->image = g_n;
 		return ;
 	}
@@ -1514,7 +1426,7 @@ ui Application::Hungarian(char initialization, ui n, ui *cost) {
 }
 
 ui Application::compute_ged_of_BX() {
-	if(upper_bound > verify_upper_bound) return upper_bound;
+	if(upper_bound > min_verify_upper_bound) return upper_bound;
 
 	ui *py = new ui[g_n];
 	for(ui i = 0;i < g_n;i ++) py[i] = q_n;

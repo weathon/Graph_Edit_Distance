@@ -32,7 +32,9 @@ private:
 
 	ui vlabels_n, elabels_n;
 
-	ui verify_upper_bound;
+	// ui verify_upper_bound;
+	ui min_verify_upper_bound;
+	ui max_verify_upper_bound;
 	ui upper_bound;
 
 	LB_Method lb_method;
@@ -73,7 +75,7 @@ private:
 	long long search_space;
 
 public:
-	Application(ui _verify_upper_bound, const char *lower_bound) ;
+	Application(ui min_verify_upper_bound, ui max_verify_upper_bound, const char *lower_bound);
 	~Application() ;
 
 	long long get_search_space() { return search_space; }
