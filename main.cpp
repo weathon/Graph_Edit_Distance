@@ -213,9 +213,15 @@ void clean_up()
 int main()
 {
 	init();
-	cout<<query(0, 1)<<endl;
-	cout<<query(0, 3)<<endl;
-	cout<<query(0, 5)<<endl;
+	cout<<query(0, 1)<<endl; //1
+	cout<<query(0, 3)<<endl; //4
+	cout<<query(0, 5)<<endl; //6
+	cout<<query(0, 7)<<endl;  //6
+	cout<<query(0, 51)<<endl; //11
+	cout<<query(0, 50)<<endl;  //9
+	cout<<query(0, 18)<<endl;  //8
+	cout<<query(0, 14)<<endl;  //6
+	cout<<query(0, 10)<<endl;  //6
 	// clean_up();
 	return 0;
 }
